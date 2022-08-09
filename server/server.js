@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const cors = require("cors");
 const connectDB = require("./config/db");
+const errorHandler = require("./middleware/errorHandler");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
@@ -21,7 +23,11 @@ app.use(cookieParser());
 
 // app.use("/api/v1", require("./src/v1/routes"));
 
+app.use("/api/auth", userRoutes);
+
 const PORT = process.env.PORT || 5000;
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
