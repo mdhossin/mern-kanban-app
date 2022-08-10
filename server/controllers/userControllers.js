@@ -25,6 +25,13 @@ exports.register = async (req, res, next) => {
         CustomErrorHandler.badRequest("Username or password can not be empty.")
       );
     }
+    if (username.length < 6) {
+      return next(
+        CustomErrorHandler.badRequest(
+          "Username must be at least 6 charactor long."
+        )
+      );
+    }
 
     if (password?.length < 6) {
       return next(

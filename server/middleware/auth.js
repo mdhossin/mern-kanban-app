@@ -3,7 +3,9 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModels");
 const auth = async (req, res, next) => {
   try {
-    const token = req.headers["authorization"];
+    let token = req.headers["authorization"];
+
+    token = token.split(" ")[1];
 
     if (!token) {
       return next(CustomErrorHandler.unAuthorized());
@@ -14,7 +16,7 @@ const auth = async (req, res, next) => {
     if (!decoded) {
       return next(CustomErrorHandler.unAuthorized);
     }
-    const user = await User.findOne({ _id: decoded.id }).select("-password");
+    const user = await User.findById({ _id: decoded.id }).select("-password");
 
     if (!user) {
       return next(CustomErrorHandler.badRequest("User does not exist."));
