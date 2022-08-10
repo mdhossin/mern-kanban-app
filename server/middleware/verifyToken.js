@@ -1,6 +1,6 @@
 const CustomErrorHandler = require("../utils/CustomErrorHandler");
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModels");
+const User = require("../models/userModel");
 const verifyToken = async (req, res, next) => {
   try {
     let token = req.headers["authorization"];

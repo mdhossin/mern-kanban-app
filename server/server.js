@@ -7,6 +7,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorHandler");
 const userRoutes = require("./routes/userRoutes");
+const boardRoutes = require("./routes/boardRoutes");
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use("/api/auth", userRoutes);
+app.use("/api/boards", boardRoutes);
 
 // delpoy code
 
