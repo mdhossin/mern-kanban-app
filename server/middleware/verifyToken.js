@@ -1,7 +1,7 @@
 const CustomErrorHandler = require("../utils/CustomErrorHandler");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModels");
-const auth = async (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   try {
     let token = req.headers["authorization"];
 
@@ -29,4 +29,4 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = auth;
+module.exports = verifyToken;

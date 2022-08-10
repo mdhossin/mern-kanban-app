@@ -18,12 +18,16 @@ exports.register = async (req, res, next) => {
   }
 
   try {
-    const { username, password } = req.body;
+    const { username, password, confirmPassword } = req.body;
 
     if (!username || !password) {
       return next(
         CustomErrorHandler.badRequest("Username or password can not be empty.")
       );
+    }
+
+    if (password !== confirmPassword) {
+      return next(CustomErrorHandler.badRequest("Password did not match."));
     }
     if (username.length < 6) {
       return next(
