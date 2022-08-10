@@ -52,8 +52,14 @@ exports.register = async (req, res, next) => {
 };
 
 exports.login = async (req, res, next) => {
-  const { username } = req.body;
+  const { username, password } = req.body;
   try {
+    if (!username || !password) {
+      return next(
+        CustomErrorHandler.badRequest("Username or password can not be empty.")
+      );
+    }
+
     const user = await User.findOne({ username }).select("password username");
     if (!user) {
       return next(
@@ -62,7 +68,7 @@ exports.login = async (req, res, next) => {
     }
 
     // if user exists
-    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return next(
         CustomErrorHandler.badRequest("Username or passowrd is wrong!")
@@ -76,6 +82,16 @@ exports.login = async (req, res, next) => {
     });
 
     res.status(200).json({ user, token });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.allUser = async (req, res, next) => {
+  try {
+    const alluser = await User.find();
+
+    res.status(200).json(alluser);
   } catch (error) {
     return next(error);
   }
