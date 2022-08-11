@@ -101,6 +101,8 @@ const Sidebar = () => {
 
       dispatch(setBoards(newList));
 
+      toast.success("Created");
+
       navigate(`/boards/${res._id}`);
     } catch (error) {
       toast.error(
