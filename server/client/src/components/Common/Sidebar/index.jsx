@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   Drawer,
   List,
@@ -12,14 +12,12 @@ import assets from "../../../assets";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
-
 import { useDispatch, useSelector } from "react-redux";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import FavouriteList from "../FavouriteList";
 import { useEffect } from "react";
 import boardsApi from "../../../api/boardsApi";
 import { setBoards } from "../../../redux/features/boardsSlice";
-import { useState } from "react";
 import { toast } from "react-toastify";
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -95,6 +93,24 @@ const Sidebar = () => {
     }
   };
 
+  const addBoard = async () => {
+    try {
+      const res = await boardsApi.create();
+
+      const newList = [res, ...boards];
+
+      dispatch(setBoards(newList));
+
+      navigate(`/boards/${res._id}`);
+    } catch (error) {
+      toast.error(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.data.message
+      );
+    }
+  };
+
   return (
     <Drawer
       container={window.document.body}
@@ -156,7 +172,7 @@ const Sidebar = () => {
             <Typography variant="body2" fontWeight="700">
               Private
             </Typography>
-            <IconButton>
+            <IconButton onClick={addBoard}>
               <AddBoxOutlinedIcon fontSize="small" />
             </IconButton>
           </Box>
