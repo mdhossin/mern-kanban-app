@@ -10,15 +10,15 @@ import axios from "axios";
 //=> 'foo[]=1&foo[]=2&foo[]=3'
 import queryString from "query-string";
 
-// const baseURL = "http://localhost:5000/api/auth";
-const baseURL = "https://mern-kanban-app.herokuapp.com/api/auth";
+const baseURL = "http://localhost:5000/api";
+// const baseURL = "https://mern-kanban-app.herokuapp.com/api/auth";
 
 const getToken = () => localStorage.getItem("token");
 
 const axiosClient = axios.create({
   baseURL,
   // parmas gulake seralize kore jonno paramsSerializer then segulake string e convert kortesi
-  // paramsSerializer: (params) => queryString.stringify({ params }),
+  paramsSerializer: (params) => queryString.stringify({ params }),
 });
 // You can intercept requests or responses before they are handled by then or catch.
 // Add a request interceptor

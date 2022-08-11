@@ -9,20 +9,59 @@ import {
 } from "@mui/material";
 import assets from "../../../assets";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import FavouriteList from "../FavouriteList";
+import { useEffect } from "react";
+import boardsApi from "../../../api/boardsApi";
+import { setBoards } from "../../../redux/features/boardsSlice";
+import { useState } from "react";
 const Sidebar = () => {
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user.value);
   const sidebarWidth = 250;
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.value);
+  const boards = useSelector((state) => state.boards.value);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const { boardId } = useParams();
 
+  console.log(activeIndex, "activeIndex");
+
+  // get all boards
+  useEffect(() => {
+    const getBoards = async () => {
+      try {
+        const res = await boardsApi.getAll();
+        dispatch(setBoards(res));
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getBoards();
+  }, [dispatch]);
+
+  // active board
+
+  useEffect(() => {
+    // GET THE FIRST ELEMENT FORM THE ARRAY
+    const activeItem = boards.findIndex((e) => e._id === boardId);
+
+    // when the board created then cannot redirect to home page redirect to boards/id page if boards have a length
+    if (boards.length > 0 && boardId === undefined) {
+      navigate(`/boards/${boards[0]._id}`);
+    }
+
+    setActiveIndex(activeItem);
+  }, [boards, boardId, navigate]);
+
+  //logout user
   const logout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
+
   return (
     <Drawer
       container={window.document.body}
@@ -89,6 +128,8 @@ const Sidebar = () => {
             </IconButton>
           </Box>
         </ListItem>
+
+        {/* draggleable component */}
       </List>
     </Drawer>
   );
