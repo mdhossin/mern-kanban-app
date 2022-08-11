@@ -6,18 +6,21 @@ import {
   Box,
   Typography,
   IconButton,
+  ListItemButton,
 } from "@mui/material";
 import assets from "../../../assets";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 
 import { useDispatch, useSelector } from "react-redux";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import FavouriteList from "../FavouriteList";
 import { useEffect } from "react";
 import boardsApi from "../../../api/boardsApi";
 import { setBoards } from "../../../redux/features/boardsSlice";
 import { useState } from "react";
+import { toast } from "react-toastify";
 const Sidebar = () => {
   const navigate = useNavigate();
   const sidebarWidth = 250;
@@ -27,8 +30,6 @@ const Sidebar = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const { boardId } = useParams();
 
-  console.log(activeIndex, "activeIndex");
-
   // get all boards
   useEffect(() => {
     const getBoards = async () => {
@@ -36,7 +37,11 @@ const Sidebar = () => {
         const res = await boardsApi.getAll();
         dispatch(setBoards(res));
       } catch (error) {
-        console.log(error.message);
+        toast.error(
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.data.message
+        );
       }
     };
     getBoards();
@@ -60,6 +65,34 @@ const Sidebar = () => {
   const logout = () => {
     localStorage.removeItem("token");
     navigate("/login");
+  };
+
+  const onDragEnd = async ({ source, destination }) => {
+    console.log(source, destination);
+    const newList = [...boards];
+    // remove the item
+    const [removed] = newList.splice(source.index, 1);
+    // add the item
+    newList.splice(destination.index, 0, removed);
+    // set the index no again
+    const activeItem = newList.findIndex((e) => e._id === boardId);
+    setActiveIndex(activeItem);
+    dispatch(setBoards(newList));
+
+    try {
+      // update the board postion when refresh the page it will be fixed after drag
+      const res = await boardsApi.updatePositoin({
+        boards: newList,
+      });
+
+      toast.success(res?.message);
+    } catch (error) {
+      toast.error(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.data.message
+      );
+    }
   };
 
   return (
@@ -130,6 +163,61 @@ const Sidebar = () => {
         </ListItem>
 
         {/* draggleable component */}
+        {/* wrap the whole content where want to drag and drop div */}
+        <DragDropContext onDragEnd={onDragEnd}>
+          {/* which div want to dropable wrap this div using dropable he taks some id and key must be provided */}
+          <Droppable
+            key={`list-board-droppable-key`}
+            droppableId={`list-board-droppable`}
+          >
+            {/* here call the anonymus function built in react-dnd provided */}
+
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                {boards.map((item, index) => (
+                  /* dragable component */
+                  <Draggable
+                    key={item._id}
+                    draggableId={item._id}
+                    /* index must need to provide check the index and match the status on item */
+                    index={index}
+                  >
+                    {/* here also get the function */}
+                    {(provided, snapshot) => (
+                      <ListItemButton
+                        ref={provided.innerRef}
+                        {...provided.dragHandleProps}
+                        {...provided.draggableProps}
+                        selected={index === activeIndex}
+                        component={Link}
+                        to={`/boards/${item._id}`}
+                        sx={{
+                          pl: "20px",
+                          cursor: snapshot.isDragging
+                            ? "grab"
+                            : "pointer !important",
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          fontWeight="700"
+                          sx={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {item.icon} {item.title}
+                        </Typography>
+                      </ListItemButton>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </List>
     </Drawer>
   );

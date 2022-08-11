@@ -25,3 +25,18 @@ exports.getAll = async (req, res, next) => {
     return next(error);
   }
 };
+
+exports.updatePosition = async (req, res) => {
+  const { boards } = req.body;
+  try {
+    for (const key in boards.reverse()) {
+      const board = boards[key];
+      await Board.findByIdAndUpdate(board._id, { $set: { position: key } });
+    }
+    res.status(200).json({
+      message: "updated",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
