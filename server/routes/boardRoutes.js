@@ -7,6 +7,7 @@ const {
   update,
   getFavourites,
   updateFavouritePosition,
+  deleteBoard,
 } = require("../controllers/boardControllers");
 const verifyToken = require("../middleware/verifyToken");
 const router = express.Router();
@@ -19,5 +20,6 @@ router.get("/:boardId", verifyToken, getOne);
 router.post("/", verifyToken, create);
 router.put("/", verifyToken, updatePosition);
 router.put("/:boardId", verifyToken, update);
+router.delete("/:boardId", verifyToken, deleteBoard);
 
 module.exports = router;

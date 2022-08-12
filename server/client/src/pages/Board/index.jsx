@@ -139,12 +139,41 @@ const Board = () => {
       }
       dispatch(setFavouriteList(newFavouriteList));
       setIsFavourite(!isFavourite);
-    } catch (err) {
-      alert(err);
+    } catch (error) {
+      toast.error(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.data.message
+      );
     }
   };
 
-  const deleteBoard = async () => {};
+  const deleteBoard = async () => {
+    try {
+      const res = await boardsApi.delete(boardId);
+      if (isFavourite) {
+        const newFavouriteList = favouriteList.filter((e) => e._id !== boardId);
+        dispatch(setFavouriteList(newFavouriteList));
+      }
+
+      const newList = boards.filter((e) => e._id !== boardId);
+      if (newList.length === 0) {
+        navigate("/boards");
+      } else {
+        navigate(`/boards/${newList[0]._id}`);
+      }
+      dispatch(setBoards(newList));
+
+      toast.success(res?.message);
+      console.log(res, "delete");
+    } catch (error) {
+      toast.error(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.data.message
+      );
+    }
+  };
 
   return (
     <>
