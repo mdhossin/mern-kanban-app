@@ -66,7 +66,6 @@ const Sidebar = () => {
   };
 
   const onDragEnd = async ({ source, destination }) => {
-    console.log(source, destination);
     const newList = [...boards];
     // remove the item
     const [removed] = newList.splice(source.index, 1);
@@ -79,11 +78,9 @@ const Sidebar = () => {
 
     try {
       // update the board postion when refresh the page it will be fixed after drag
-      const res = await boardsApi.updatePositoin({
+      await boardsApi.updatePositoin({
         boards: newList,
       });
-
-      toast.success(res?.message);
     } catch (error) {
       toast.error(
         error.response && error.response.data.message

@@ -77,47 +77,69 @@ exports.getOne = async (req, res, next) => {
   }
 };
 
-exports.update = async (req, res, next) => {
+exports.update = async (req, res) => {
   const { boardId } = req.params;
-
   const { title, description, favourite } = req.body;
 
   try {
     if (title === "") req.body.title = "Untitled";
     if (description === "") req.body.description = "Add description here";
-
     const currentBoard = await Board.findById(boardId);
+    if (!currentBoard) return res.status(404).json("Board not found");
 
     if (favourite !== undefined && currentBoard.favourite !== favourite) {
       const favourites = await Board.find({
         user: currentBoard.user,
         favourite: true,
-        // $ne = not equal
         _id: { $ne: boardId },
       }).sort("favouritePosition");
-
       if (favourite) {
         req.body.favouritePosition =
           favourites.length > 0 ? favourites.length : 0;
       } else {
         for (const key in favourites) {
-          console.log(key, favourites, "favourites");
           const element = favourites[key];
-
           await Board.findByIdAndUpdate(element._id, {
-            $set: {
-              favouritePosition: key,
-            },
+            $set: { favouritePosition: key },
           });
         }
       }
     }
 
-    const board = await Board.findByIdAndUpdate(boardId, {
-      $set: req.body,
-    });
-
+    const board = await Board.findByIdAndUpdate(boardId, { $set: req.body });
     res.status(200).json(board);
+  } catch (error) {
+    return next(error);
+  }
+};
+exports.getFavourites = async (req, res, next) => {
+  try {
+    const favourites = await Board.find({
+      user: req.user._id,
+      favourite: true,
+    }).sort("-favouritePosition");
+
+    res.status(200).json(favourites);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.updateFavouritePosition = async (req, res, next) => {
+  const { boards } = req.body;
+  try {
+    for (const key in boards.reverse()) {
+      const board = boards[key];
+      await Board.findByIdAndUpdate(board._id, {
+        $set: {
+          favouritePosition: key,
+        },
+      });
+    }
+
+    res.status(200).json({
+      message: "Updated",
+    });
   } catch (error) {
     return next(error);
   }

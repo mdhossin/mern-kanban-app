@@ -5,7 +5,7 @@ const verifyToken = async (req, res, next) => {
   try {
     let token = req.headers["authorization"];
 
-    token = token.split(" ")[1];
+    token = token?.split(" ")[1];
 
     if (!token) {
       return next(CustomErrorHandler.unAuthorized());

@@ -1,21 +1,23 @@
-import { Box, IconButton, TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import boardsApi from "../../api/boardsApi";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
 import StarOutlinedIcon from "@mui/icons-material/StarOutlined";
-import { EmojiPicker, Kanban } from "../../components";
+import { Box, IconButton, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import boardsApi from "../../api/boardsApi";
+import EmojiPicker from "../../components/Common/EmojiPicker";
+import Kanban from "../../components/Common/Kanban";
 import { setBoards } from "../../redux/features/boardsSlice";
-
+import { setFavouriteList } from "../../redux/features/favouriteSlice";
+import { toast } from "react-toastify";
 let timer;
 const timeout = 500;
 
 const Board = () => {
-  const { boardId } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { boardId } = useParams();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [sections, setSections] = useState([]);
@@ -23,18 +25,17 @@ const Board = () => {
   const [icon, setIcon] = useState("");
 
   const boards = useSelector((state) => state.boards.value);
+  const favouriteList = useSelector((state) => state.favourites.value);
 
   useEffect(() => {
     const getBoard = async () => {
       try {
         const res = await boardsApi.getOne(boardId);
-
         setTitle(res.title);
         setDescription(res.description);
         setSections(res.sections);
+        setIsFavourite(res.favourite);
         setIcon(res.icon);
-
-        console.log(res, "home board");
       } catch (error) {
         toast.error(
           error.response && error.response.data.message
@@ -49,15 +50,20 @@ const Board = () => {
   const onIconChange = async (newIcon) => {
     let temp = [...boards];
     const index = temp.findIndex((e) => e._id === boardId);
+    temp[index] = { ...temp[index], icon: newIcon };
 
-    temp[index] = {
-      ...temp[index],
-      icon: newIcon,
-    };
+    if (isFavourite) {
+      let tempFavourite = [...favouriteList];
+      const favouriteIndex = tempFavourite.findIndex((e) => e._id === boardId);
+      tempFavourite[favouriteIndex] = {
+        ...tempFavourite[favouriteIndex],
+        icon: newIcon,
+      };
+      dispatch(setFavouriteList(tempFavourite));
+    }
 
     setIcon(newIcon);
     dispatch(setBoards(temp));
-
     try {
       await boardsApi.update(boardId, { icon: newIcon });
     } catch (error) {
@@ -69,22 +75,6 @@ const Board = () => {
     }
   };
 
-  const addFavourite = async () => {
-    try {
-      const res = await boardsApi.update(boardId, {
-        favourite: !isFavourite,
-      });
-      console.log(res, "favourte");
-
-      setIsFavourite(!isFavourite);
-    } catch (error) {
-      toast.error(
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.data.message
-      );
-    }
-  };
   const updateTitle = async (e) => {
     clearTimeout(timer);
     const newTitle = e.target.value;
@@ -92,19 +82,23 @@ const Board = () => {
 
     let temp = [...boards];
     const index = temp.findIndex((e) => e._id === boardId);
+    temp[index] = { ...temp[index], title: newTitle };
 
-    temp[index] = {
-      ...temp[index],
-      title: newTitle,
-    };
+    if (isFavourite) {
+      let tempFavourite = [...favouriteList];
+      const favouriteIndex = tempFavourite.findIndex((e) => e._id === boardId);
+      tempFavourite[favouriteIndex] = {
+        ...tempFavourite[favouriteIndex],
+        title: newTitle,
+      };
+      dispatch(setFavouriteList(tempFavourite));
+    }
 
     dispatch(setBoards(temp));
 
     timer = setTimeout(async () => {
       try {
-        await boardsApi.update(boardId, {
-          title: newTitle,
-        });
+        await boardsApi.update(boardId, { title: newTitle });
       } catch (error) {
         toast.error(
           error.response && error.response.data.message
@@ -117,15 +111,11 @@ const Board = () => {
 
   const updateDescription = async (e) => {
     clearTimeout(timer);
-
     const newDescription = e.target.value;
     setDescription(newDescription);
-
     timer = setTimeout(async () => {
       try {
-        await boardsApi.update(boardId, {
-          description: newDescription,
-        });
+        await boardsApi.update(boardId, { description: newDescription });
       } catch (error) {
         toast.error(
           error.response && error.response.data.message
@@ -135,12 +125,33 @@ const Board = () => {
       }
     }, timeout);
   };
+
+  const addFavourite = async () => {
+    try {
+      const board = await boardsApi.update(boardId, {
+        favourite: !isFavourite,
+      });
+      let newFavouriteList = [...favouriteList];
+      if (isFavourite) {
+        newFavouriteList = newFavouriteList.filter((e) => e._id !== boardId);
+      } else {
+        newFavouriteList.unshift(board);
+      }
+      dispatch(setFavouriteList(newFavouriteList));
+      setIsFavourite(!isFavourite);
+    } catch (err) {
+      alert(err);
+    }
+  };
+
+  const deleteBoard = async () => {};
+
   return (
     <>
       <Box
         sx={{
           display: "flex",
-          alignIitems: "center",
+          alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
         }}
@@ -152,17 +163,11 @@ const Board = () => {
             <StarBorderOutlinedIcon />
           )}
         </IconButton>
-
-        <IconButton variant="outlined" color="error">
+        <IconButton variant="outlined" color="error" onClick={deleteBoard}>
           <DeleteOutlinedIcon />
         </IconButton>
       </Box>
-
-      <Box
-        sx={{
-          padding: "10px 50px",
-        }}
-      >
+      <Box sx={{ padding: "10px 50px" }}>
         <Box>
           {/* emoji picker */}
           <EmojiPicker icon={icon} onChange={onIconChange} />
@@ -195,9 +200,8 @@ const Board = () => {
             }}
           />
         </Box>
-
         <Box>
-          {/* kanban board */}
+          {/* Kanban board */}
           <Kanban data={sections} boardId={boardId} />
         </Box>
       </Box>
