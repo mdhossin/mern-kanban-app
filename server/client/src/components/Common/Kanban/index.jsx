@@ -15,6 +15,9 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import sectionApi from "../../../api/sectionApi";
 
+let timer;
+const timeout = 500;
+
 const Kanban = (props) => {
   const boardId = props.boardId;
 
@@ -53,6 +56,22 @@ const Kanban = (props) => {
           : error.data.message
       );
     }
+  };
+
+  const updateSectionTitle = async (e, sectionId) => {
+    clearTimeout(timer);
+    const newTitle = e.target.value;
+    const newData = [...data];
+    const index = newData.findIndex((e) => e._id === sectionId);
+    newData[index].title = newTitle;
+    setData(newData);
+    timer = setTimeout(async () => {
+      try {
+        await sectionApi.update(boardId, sectionId, { title: newTitle });
+      } catch (err) {
+        alert(err);
+      }
+    }, timeout);
   };
 
   const onDragEnd = async ({ source, destination }) => {};
@@ -105,7 +124,7 @@ const Kanban = (props) => {
                     >
                       <TextField
                         value={section.title}
-                        // onChange={(e) => updateSectionTitle(e, section.id)}
+                        onChange={(e) => updateSectionTitle(e, section._id)}
                         placeholder="Untitled"
                         variant="outlined"
                         sx={{

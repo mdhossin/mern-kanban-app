@@ -33,13 +33,13 @@ exports.update = async (req, res, next) => {
   }
 };
 
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
   const { sectionId } = req.params;
   try {
     await Task.deleteMany({ section: sectionId });
     await Section.deleteOne({ _id: sectionId });
     res.status(200).json("deleted");
   } catch (err) {
-    res.status(500).josn(err);
+    return next(error);
   }
 };

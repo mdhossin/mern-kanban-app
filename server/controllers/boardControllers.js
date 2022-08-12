@@ -29,7 +29,7 @@ exports.getAll = async (req, res, next) => {
   }
 };
 
-exports.updatePosition = async (req, res) => {
+exports.updatePosition = async (req, res, next) => {
   const { boards } = req.body;
   try {
     for (const key in boards.reverse()) {
@@ -72,7 +72,7 @@ exports.getOne = async (req, res, next) => {
   }
 };
 
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   const { boardId } = req.params;
   const { title, description, favourite } = req.body;
 
@@ -140,7 +140,7 @@ exports.updateFavouritePosition = async (req, res, next) => {
   }
 };
 
-exports.deleteBoard = async (req, res) => {
+exports.deleteBoard = async (req, res, next) => {
   const { boardId } = req.params;
   try {
     const sections = await Section.find({ board: boardId });

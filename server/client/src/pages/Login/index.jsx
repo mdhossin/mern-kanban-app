@@ -33,7 +33,7 @@ const Login = () => {
       setError(
         error.response && error.response.data.message
           ? error.response.data.message
-          : error.data.message
+          : error.message
       );
       setLoading(false);
     }

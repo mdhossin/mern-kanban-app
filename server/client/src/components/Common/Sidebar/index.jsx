@@ -55,6 +55,9 @@ const Sidebar = () => {
     if (boards.length > 0 && boardId === undefined) {
       navigate(`/boards/${boards[0]._id}`);
     }
+    if (boards.length === 0) {
+      navigate(`/boards`);
+    }
 
     setActiveIndex(activeItem);
   }, [boards, boardId, navigate]);
@@ -117,7 +120,9 @@ const Sidebar = () => {
       open={true}
       sx={{
         width: sidebarWidth,
-        height: "100vh",
+        height: "100%",
+        minHeight: "100vh",
+        overflowY: "scroll",
         "& > div": {
           borderRight: "none",
         },
@@ -127,7 +132,9 @@ const Sidebar = () => {
         disablePadding
         sx={{
           width: sidebarWidth,
-          height: "100vh",
+          height: "100%",
+          minHeight: "100vh",
+          overflowY: "scroll",
           backgroundColor: assets.colors.secondary,
         }}
       >
