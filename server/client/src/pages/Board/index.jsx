@@ -165,7 +165,6 @@ const Board = () => {
       dispatch(setBoards(newList));
 
       toast.success(res?.message);
-      console.log(res, "delete");
     } catch (error) {
       toast.error(
         error.response && error.response.data.message

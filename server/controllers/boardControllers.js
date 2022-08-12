@@ -56,21 +56,16 @@ exports.getOne = async (req, res, next) => {
     if (!board) {
       return next(CustomErrorHandler.notFound("Board not found."));
     }
+    const sections = await Section.find({ board: boardId });
 
-    const sections = await Section.find({
-      board: boardId,
-    });
     // populate() function in mongoose is used for populating the data inside the reference
     for (const section of sections) {
-      const tasks = await Task.find({
-        section: section._id,
-      }).populate.sort("-position");
-
+      const tasks = await Task.find({ section: section._id })
+        .populate("section")
+        .sort("-position");
       section._doc.tasks = tasks;
     }
-
     board._doc.sections = sections;
-
     res.status(200).json(board);
   } catch (error) {
     return next(error);

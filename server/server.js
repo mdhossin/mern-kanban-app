@@ -8,6 +8,7 @@ const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorHandler");
 const userRoutes = require("./routes/userRoutes");
 const boardRoutes = require("./routes/boardRoutes");
+const sectionRoutes = require("./routes/sectionRoutes");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", userRoutes);
 app.use("/api/boards", boardRoutes);
+app.use("/api/boards/:boardId/sections", sectionRoutes);
 
 // delpoy code
 
