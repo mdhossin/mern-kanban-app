@@ -9,6 +9,7 @@ const errorHandler = require("./middleware/errorHandler");
 const userRoutes = require("./routes/userRoutes");
 const boardRoutes = require("./routes/boardRoutes");
 const sectionRoutes = require("./routes/sectionRoutes");
+const taskRoutes = require("./routes/taskRoutes");
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 app.use("/api/auth", userRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/boards/:boardId/sections", sectionRoutes);
+app.use("/api/boards/:boardId/tasks", taskRoutes);
 
 // delpoy code
 
