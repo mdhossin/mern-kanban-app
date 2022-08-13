@@ -12,7 +12,9 @@ import React, { useEffect, useRef, useState } from "react";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import taskApi from "../../../api/taskApi";
 import Moment from "moment";
-
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import "../../../css/custom-editor.css";
 const modalStyle = {
   outline: "none",
   position: "absolute",
@@ -45,7 +47,7 @@ const TaskModal = (props) => {
     if (props.task !== undefined) {
       isModalClosed = false;
 
-      // updateEditorHeight()
+      updateEditorHeight();
     }
   }, [props.task]);
 
@@ -80,6 +82,38 @@ const TaskModal = (props) => {
     setTitle(newTitle);
     props.onUpdate(task);
   };
+
+  const updateContent = async (event, editor) => {
+    clearTimeout(timer);
+    const data = editor.getData();
+
+    console.log({ isModalClosed });
+
+    if (!isModalClosed) {
+      timer = setTimeout(async () => {
+        try {
+          await taskApi.update(boardId, task._id, { content: data });
+        } catch (err) {
+          alert(err);
+        }
+      }, timeout);
+
+      task.content = data;
+      setContent(data);
+      props.onUpdate(task);
+    }
+  };
+
+  const updateEditorHeight = () => {
+    setTimeout(() => {
+      if (editorWrapperRef.current) {
+        const box = editorWrapperRef.current;
+        box.querySelector(".ck-editor__editable_inline").style.height =
+          box.offsetHeight - 50 + "px";
+      }
+    }, timeout);
+  };
+
   return (
     <Modal
       open={task !== undefined}
@@ -142,13 +176,13 @@ const TaskModal = (props) => {
                 overflowY: "auto",
               }}
             >
-              {/* <CKEditor
-            editor={ClassicEditor}
-            data={content}
-            onChange={updateContent}
-            onFocus={updateEditorHeight}
-            onBlur={updateEditorHeight}
-          /> */}
+              <CKEditor
+                editor={ClassicEditor}
+                data={content}
+                onChange={updateContent}
+                onFocus={updateEditorHeight}
+                onBlur={updateEditorHeight}
+              />
             </Box>
           </Box>
         </Box>
