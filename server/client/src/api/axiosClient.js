@@ -10,8 +10,8 @@ import axios from "axios";
 //=> 'foo[]=1&foo[]=2&foo[]=3'
 import queryString from "query-string";
 
-const baseURL = "http://localhost:5000/api";
-// const baseURL = "https://mern-kanban-app.herokuapp.com/api/auth";
+// const baseURL = "http://localhost:5000/api";
+const baseURL = "https://mern-kanban-app.herokuapp.com/api/auth";
 
 const getToken = () => localStorage.getItem("token");
 
