@@ -14,3 +14,4 @@ Here is the live link -
 (https://mern-kanban-app.herokuapp.com/)
 
 Website Interface -
+![plot](./server/client/src/assets/kanban.PNG)

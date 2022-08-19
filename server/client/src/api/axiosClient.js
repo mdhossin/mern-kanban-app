@@ -11,7 +11,7 @@ import axios from "axios";
 import queryString from "query-string";
 
 // const baseURL = "http://localhost:5000/api";
-const baseURL = "https://mern-kanban-app.herokuapp.com/api/auth";
+const baseURL = "https://mern-kanban-app.herokuapp.com/api";
 
 const getToken = () => localStorage.getItem("token");
 

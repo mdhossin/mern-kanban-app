@@ -1,34 +1,34 @@
 .ck.ck-editor__main > .ck-editor__editable {
-  background-color: transparent;
-  border: none;
-  outline: none;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
 }
 
 .ck.ck-editor__main > .ck-editor__editable.ck-focused {
-  border: none;
+  border: none !important;
 }
 
 .ck.ck-toolbar .ck.ck-toolbar__separator {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 
 .ck.ck-toolbar.ck-toolbar_grouping {
-  background-color: transparent;
-  border: none;
+  background-color: transparent !important;
+  border: none !important;
 }
 
 .ck.ck-button,
 .ck.ck-button.ck-on {
-  color: white;
-  background-color: transparent;
+  color: white !important;
+  background-color: transparent !important;
 }
 
 .ck.ck-button:hover,
 .ck.ck-button.ck-off:hover,
 .ck.ck-button.ck-on:hover {
   background-color: transparent !important;
-  cursor: pointer;
-  color: gray;
+  cursor: pointer !important;
+  color: gray !important;
 }
 
 .ck-dropdown__panel .ck.ck-button.ck-off.ck-button__with-text {
@@ -40,7 +40,7 @@
 }
 
 .ck-dropdown__panel .ck-dropdown__panel-visible {
-  border: none;
+  border: none !important;
 }
 
 .ck-editor__top {
