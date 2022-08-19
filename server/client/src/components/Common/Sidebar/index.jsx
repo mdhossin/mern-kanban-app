@@ -28,6 +28,8 @@ const Sidebar = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const { boardId } = useParams();
 
+  const [w, setW] = useState(window.innerWidth);
+
   // get all boards
   useEffect(() => {
     const getBoards = async () => {
@@ -113,8 +115,19 @@ const Sidebar = () => {
     }
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      setW(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <Drawer
+      className="someClass"
       container={window.document.body}
       variant="permanent"
       open={true}
@@ -154,7 +167,7 @@ const Sidebar = () => {
                 textTransform: "capitalize",
               }}
             >
-              {user.username}
+              {user.username} {w}
             </Typography>
 
             <IconButton onClick={logout}>
